@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Cache-Control" content="no-store" />
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<title>NerabotiX</title>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script type="text/javascript" src="widgets.js"></script>
+<script type="text/javascript" src="npc.js"></script>
+<script type="text/javascript" src="nerabotix.js"></script>
+</head>
+
+<body>
+<div id="doc" class="sheet closed">
+	<div id="header">
+		<div id="temp">
+			<div align="right" style="width: 50%; margin: 0 auto;">
+				<h1 style="margin-bottom: 0;">Welkam tu NerabotiX</h1>
+				<p style="margin: 0;">f***ing the future</p>
+			</div>
+			<button style="margin: 20px;" onclick="start();">Enter</button>
+			<span onclick="showOptions(); this.style.display='none';">More options...</span>
+			<div id="temp_more">
+			<button id="resignBtn" title="Quit the current job (reset)" onclick="doResign()">Resign</button>
+			<button id="amnesiaBtn" title="Lose your skill and forget all (hard reset)" onclick="doAmnesia()">Amnesia</button>
+			<button id="importBtn" title="(import state)" onclick="doImport()">Import</button>
+			<button id="exportBtn" title="(export state)" onclick="doExport()">Export</button>
+			</div>
+		</div>
+		<div id="headerline" style="display:none;">
+			<div id="clock"></div>
+			<div id="dayItem" class="Item">Day </div>
+			<span id="caption"></span>
+		</div>
+	</div>
+	<div id="ws" style="display:none;">
+		<div id="items">
+			<div id="newTaskItem" class="Item">New tasks:</div>
+			<div id="compTaskItem" class="Item">Tasks completed:</div>
+			<div id="deadlineItem" class="Item">Deadlines passed:</div>
+		</div>
+		<div id="npc" style="display:none;">
+			<div id="npcStat" class="Table" style="float: right;"></div>
+			<div id="npcName" class="Item">You meet:</div>
+			<div id="npcInfo" class="Item small-info"></div>
+			<div id="npcActs" class="Table"></div>
+			<div id="npcExtra" class="Widget"></div>
+		</div>
+		<div id="wb">
+		<table id="workTable" style="width:100%;"><tbody><tr>
+			<td><button id="workBtn" title="Work hardly on the task" onclick="doWork();">Do work</button></td>
+			<td><div id="solveProgress" class="ProgressBar"></div></td>
+			<td>
+				<label id="teapotChk" class="CheckBox">Teapot</label>
+			</td>
+		  </tr><tr>
+			<td><button id="teaBtn" title="Take a cup of tea or coffee" onclick="tea();">Tea</button></td>
+			<td><div id="teaProgress" class="ProgressBar" color="#C64A19"></div></td>
+			<td>
+				<label id="coffeeChk" class="CheckBox">Coffee</label>
+				<label id="wafflesChk" class="CheckBox">Waffles</label>
+				<label id="kvassChk" class="CheckBox">Kvass</label>
+			</td>
+		  </tr><tr>
+			<td><button id="lunchBtn" title="Have a lunch" onclick="lunch();">Lunch</button></td>
+			<td><div id="lunchProgress" class="ProgressBar" color="#C64A19"></div></td>
+			<td></td>
+		  </tr><tr>
+			<td><button id="homeBtn" title="Go home to restore your power" onclick="goHome();">Go home</button></td>
+			<td><div id="homeProgress" class="ProgressBar" color="#C64A19"></div></td>
+			<td>
+				<button id="checkinBtn" title="Attach a pass to the check-point" onclick="checkin();">Check in</button>
+				<span id="smartWatchTime" class="watch" title="SmartWatch" style="display: none;"></span>
+				<span id="smartWatch2" class="watch" title="Overwork time" style="display: none;"></span>
+			</td>
+		  </tr><tr>
+			<td><button id="coffeeBtn" title="Make a cup of coffee" onclick="makeCoffee();">Make coffee</button></td>
+			<td><div id="coffeeProgress" class="ProgressBar" color="brown"></div></td>
+			<td></td>
+		  </tr><tr>
+			<td><button id="mixBtn" title="Make cocktail" onclick="makeCocktail();">Shake</button></td>
+			<td><div id="mixProgress" class="ProgressBar" color="brown"></div></td>
+			<td><select id="mixItem1"></select><select id="mixItem2"></select></td>
+		  </tr><tr>
+			<td><button id="compBtn0" title="Start the computer to automatically complete the tasks" onclick="startComputer(0);">Start computer</button></td>
+			<td><div id="compProgress0" class="ProgressBar"></div></td>
+			<td><label id="overclock0" class="CheckBox">Overclocking</label></td>
+		  </tr><tr>
+			<td><button id="compBtn1" title="Start the computer to automatically complete the tasks" onclick="startComputer(1);">Start computer</button></td>
+			<td><div id="compProgress1" class="ProgressBar"></div></td>
+			<td><label id="overclock1" class="CheckBox">Overclocking</label></td>
+		  </tr><tr>
+			<td><button id="compBtn2" title="Start the computer to automatically complete the tasks" onclick="startComputer(2);">Start computer</button></td>
+			<td><div id="compProgress2" class="ProgressBar"></div></td>
+			<td><label id="overclock2" class="CheckBox">Overclocking</label></td>
+		  </tr><tr>
+			<td><button id="compBtn3" title="Start the computer to automatically complete the tasks" onclick="startComputer(3);">Start computer</button></td>
+			<td><div id="compProgress3" class="ProgressBar"></div></td>
+			<td><label id="overclock3" class="CheckBox">Overclocking</label></td>
+		  </tr><tr>
+			<td><button id="compBtn4" title="Start the computer to automatically complete the tasks" onclick="startComputer(4);">Start computer</button></td>
+			<td><div id="compProgress4" class="ProgressBar"></div></td>
+			<td><label id="overclock4" class="CheckBox">Overclocking</label></td>
+		</tr></tbody></table>
+		<div id="buttons">
+			<button id="beerBtn" title="Drink beer" onclick="useItem('Beer');">Beer</button>
+			<button id="stoutBtn" title="Drink stout" onclick="useItem('Stout');">Stout</button>
+			<button id="borschBtn" title="Eat borsch" onclick="useItem('Borsch');">Borsch</button>
+			<button id="vodkaBtn" title="Drink vodka" onclick="useItem('Vodka');">Vodka</button>
+			<button id="yorshBtn" title="Drink yorsh" onclick="useItem('Yorsh');">Yorsh</button>
+			<button id="blackRusBtn" title="Drink black russian cocktail" onclick="useItem('Black russian');">Black rus</button>
+			<button id="whiteRusBtn" title="Drink white russian cocktail" onclick="useItem('White russian');">White rus</button>
+		</div>
+		</div>
+		<button id="sleepBtn" title="Go to sleep if you're tired" onclick="sleep();">Sleep</button>
+	</div>
+<!-- 	<div id="things">
+		<div id="coffeeMaker">Coffee maker<div id="coffeeMakerProgress" class="ProgressBar" color="brown"></div></div>
+	</div> -->
+	<div id="footer"></div>
+</div>
+
+<div id="stat" class="sheet closed" style="display:none;">
+	<div>
+		<div id="skillItem" class="Item">Your skill:</div>
+		<div id="lvlItem" class="Item">Your level:</div>
+		<div id="salaryItem" class="Item">Your salary: </div>
+		<div id="moneyItem" class="Item">Your money: </div>
+	</div>
+	<table id="statTable"><tbody>
+	<tr title="Experience">	<td>XP</td><td><div id="xpProgress" class="ProgressBar smooth" color="#95DFE8"></div></td>		</tr>
+	<tr title="Health">		<td>HP</td><td><div id="hpProgress" class="ProgressBar smooth" color="#F1B5BB"></div></td>		</tr>
+	<tr title="Sleepiness">	<td>SL</td><td><div id="sleepyProgress" class="ProgressBar smooth" color="#8F70C5"></div></td>	</tr>
+	<tr title="Authority">	<td>AT</td><td><div id="weightProgress" class="ProgressBar smooth" color="#808080"></div></td>	</tr>
+	</tbody></table>
+	<div id="itemsHave" style="display:none;">
+	<h2 style="padding-top: 16px;">You have:</h2>
+	</div>
+</div>
+
+<div id="upgrades" class="sheet stack closed" style="display:none;">
+	<h2 onclick="setActiveTab('upgrades');">Upgrades</h2>
+	<div>
+		<br>
+		<div id="availXP" class="Item">Remaining XP:</div>
+		<div class="itemcontainer"><table id="upgradetable"></table></div>
+	</div>
+</div>
+<div id="achievements" class="sheet stack closed" style="display:none;">
+	<h2 onclick="setActiveTab('achievements');">Achievements</h2>
+	<div>
+		<br>
+		<div id="achProgress" class="ProgressBar smooth"></div>
+		<div class="itemcontainer"><table id="achievetable"></table></div>
+	</div>
+</div>
+<div id="shop" class="sheet stack closed" style="display:none;">
+	<h2 onclick="setActiveTab('shop');">Shop</h2>
+	<div>
+		<br>
+		<div class="itemcontainer"><table id="shoptable"></table></div>
+	</div>
+</div>
+
+</body>
+</html>
