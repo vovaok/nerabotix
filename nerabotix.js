@@ -1,4 +1,4 @@
-var version = "0.8.4";
+var version = "0.8.5";
 
 var upgrades = 
 {
@@ -65,7 +65,7 @@ var achievements =
 	"Shit producer":	{mult: 1.05, xp: 1e9, 		info: "Make 100 pieces of bullshit", expr: "state.bullshitMade", value: 100},
 	"Sommelier":		{mult: 1.05, xp: 1e9,		info: "Discover different kinds of bullshit", expr: "state.bullshitKinds.length", value: "bullshitCount()"},
 	"Master of Time":	{mult: 1.05, xp: 1e12,		info: "Stop the time...", hidden: true},
-	"Boris-ich":		{mult: 1.05, xp: 1e9, 		info: "Punch the Curly One in the face", hidden: true}
+	"Son of Boris":		{mult: 1.05, xp: 1e9, 		info: "Punch the Curly One in the face", hidden: true}
 };
 var achItems = [];
 
@@ -77,10 +77,10 @@ var goods =
 	"Beer":				{cost: 40,		info: "Has stronger effect than kvass"},
 	"Vodka":			{cost: 100,		info: "You seem to drop out of reality"},
 	"Milk":				{cost: 30,		info: "Milk is good for your health"},
-	"Teapot":			{cost: 500, 	info: "With teapot you can drink tea while working", maxcount: 1},
+	"Teapot":			{cost: 200, 	info: "With teapot you can drink tea while working", maxcount: 1},
 	"Coffee maker": 	{cost: 1000, 	info: "Makes the cup of aromatic coffee", maxcount: 1},
 	"Computer": 		{cost: 5000, 	info: "Work on the tasks for you", maxcount: 5},
-	"Overclocker kit": 	{cost: 10000, 	info: "Overclock your computer to achieve unbelievable performance!\nBut this is dangerous! You are warned", maxcount: 5},
+	"Overclocker kit": 	{cost: 1500, 	info: "Overclock your computer to achieve unbelievable performance!\nBut this is dangerous! You are warned", maxcount: 5},
 	"Shaker": 			{cost: 800, 	info: "You can make some cocktails", maxcount: 1},
 	"SmartWatch":		{cost: 3300,	info: "Helps you manage time", maxcount: 1, hidden: true}
 };
@@ -162,6 +162,7 @@ class State
 		this.noWorkTime = 0;
 		this.deadlinesPassed = 0;
 		this.deadlinesFailed = 0;
+		this.overallDeadlinesPassed = 0;
 		this.compSolvedTasks = 0;
 		this.kvassDrunk = 0;
 		this.beerDrunk = 0;
@@ -224,6 +225,7 @@ class State
 		this._checkinActive = false;
 
 		this.deadlinesInRow = 0;
+		this.deadlinesPassed = 0;
 	}
 
 	save()
@@ -620,6 +622,8 @@ window.onload = function()
 
 		if (started && state.weight == 0)
 			showFired("authority");
+
+		checkVersion(); // test if there is update available
 	};
 
 	for (var upg in upgrades)
@@ -648,6 +652,8 @@ window.onload = function()
 			m++;
 		}
 	}
+
+	checkVersion();
 
 // 	if (clock.isNight)
 // 		clock.onnight();
@@ -1791,15 +1797,20 @@ function useItem(name)
 		else if (name == "Vodka")
 		{
 			state.vodkaDrunk++;
-			var t = Math.round(Math.random()*480 + 120);
-			clock.warpTime(t);
-			state.HP -= 20;
-			setFooter("You were drunk for " + beaday(t/1440));
-			if (!state.home && !clock.isNight && Math.random() < 0.2)
+			document.body.classList.add("drunk");
+			setTimeout(function()
 			{
-				state.weight -= 5;
-				setFooter("The boss found you drunk and disappointed in you");
-			}
+				document.body.classList.remove("drunk");
+				var t = Math.round(Math.random()*480 + 120);
+				clock.warpTime(t);
+				state.HP -= 20;
+				setFooter("You were drunk for " + beaday(t/1440));
+				if (!state.home && !clock.isNight && Math.random() < 0.2)
+				{
+					state.weight -= 5;
+					setFooter("The boss found you drunk and disappointed in you");
+				}
+			}, 2000);
 		}
 		else if (name == "Yorsh")
 		{
@@ -1872,6 +1883,7 @@ function checkDeadline()
 		var m = t / 1000;
 		state.money += m;
 		state.deadlinesPassed++;
+		state.overallDeadlinesPassed++;
 		state.deadlinesInRow++;
 		achItems["Workaholic"].update();
 		setFooter("You pass the deadline and boss give you a bonus: $"+m);
@@ -2343,3 +2355,20 @@ function doAmnesia()
 	}
 }
 //------------------------------------------------
+
+async function getJson(url)
+{
+    let resp = await fetch(url);
+    if (resp.ok)
+        return await resp.json();
+    else
+        throw new Error("Can't fetch JSON");
+}
+	
+function checkVersion()
+{
+	getJson('./version.json').then(json =>
+    {
+		console.log(json);
+	});
+}

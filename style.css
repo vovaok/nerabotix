@@ -49,14 +49,26 @@ body.night
 	border-radius: 0 0 .5em .5em;
 	position: fixed;
 	box-shadow: 0 0 1em 0 rgba(0, 0, 0, 0.2);
-	transition: transform 2s ease-in-out;
+	transition: transform 2s ease-in-out, filter 2s;
 	max-height: calc(100vh - 5em);
-	width: 23em;
+	width: min(23em, 25vw);
 }
 
 body.night .sheet
 {
 	border-color: var(--theme-color-night-dark);
+}
+
+body.drunk
+{	
+}
+
+body.drunk .sheet
+{
+	transition: all 2s cubic-bezier(1, 1.58, 0.29, -1.33);
+	transform: skew(-10deg);
+	filter: blur(10px);
+	background-color: #00F4;
 }
 
 h2
@@ -96,13 +108,6 @@ h2
 	margin: 10px 25px;
 }
 
-#doc
-{
-	width: 50em;
-	left: 50%;
-	margin-left: -25.5em;
-}
-
 #stat
 {
  	left: 50%;
@@ -136,15 +141,22 @@ body
 {
 	transform: translateY(-100%);
 }
+
+#doc
+{
+	width: 40vw;
+	left: 50vw;
+	margin-left: calc(-20vw - .5em - 1px);
+}
 	
 #stat
 {
-	margin-left: 26.3em;
+	margin-left: 21vw;
 }
 
 .stack
 {
-	margin-right: 26.3em;
+	margin-right: 21vw;
 }
 
 .stack:nth-of-type(5)
@@ -174,17 +186,30 @@ body
 {
 body
 {
-	font-size: 1.5vw;
+	font-size: 2.5vw;
 }
 
 .sheet
 {
 	/* justify-content: flex-start; */
+	width: 45%;
+}
+
+.ProgressBar
+{
+	max-width: 20em;
+}
+
+#doc
+{
+	width: 94vw;
+	left: 50vw;
+	margin-left: calc(-47vw - .5em - 1px);
 }
 	
 #stat
 {
-	margin-left: 2em;	
+	margin-left: 1vw;	
 	bottom: 0;
 	padding-bottom: 1.5em;
 	border-radius: .5em .5em 0 0;
@@ -192,7 +217,7 @@ body
 
 .stack
 {
-	margin-right: 2em;
+	margin-right: 1vw;
 	bottom: 0;
 	border-radius: .5em .5em 0 0;
 }
@@ -559,7 +584,7 @@ table
 	position: relative;
 	top: .2em;
 	min-width: 150px;
-	width: 250px;
+	width: 15vw;
 	border: 1px solid black;
 	padding: 1px;
 	border-radius: 3px;
