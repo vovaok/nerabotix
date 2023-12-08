@@ -458,9 +458,10 @@ class Achievement extends Widget
 		var _this = this;
 
 		var tr = document.createElement("tr");
+		tr.setAttribute("hint", _this.hintText);
 		this._tr = tr;
-		tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
-		tr.onmouseout = function(){btn.widget.collapseHint();};
+		// tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
+		// tr.onmouseout = function(){btn.widget.collapseHint();};
 		var td = document.createElement("td");
 		td.innerText = name;
 		tr.appendChild(td);
@@ -507,7 +508,7 @@ class Achievement extends Widget
 			state.updateMultiplier(this.obj.mult);
 			this._btn.widget.disabled = false;
 			updateAchieveProgress();
-			setFooter("Achievement unlocked: " + this._name + " - " + this.hintText);
+			setFooter(`Achievement unlocked: <b>${this._name}</b> - ${this.hintText}`);
 			save();
 		}
 	}

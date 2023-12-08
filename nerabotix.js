@@ -1,5 +1,3 @@
-var version = "0.8.5";
-
 var upgrades = 
 {
  	"Success": {_var: "taskSolveChance", values: [30, 40, 50, 60, 70, 80, 90, 100], xp: [100, 250, 666, 1000, 1666, 2500, 4000, 6666], info: "Improve your punctuality from $cur% to $next% to complete the tasks"},
@@ -147,7 +145,7 @@ class State
 {
 	constructor()
 	{
-		this._version = version;
+		this._version = 0;
 		this.step = 0;
 		this._multiplier = 1;
 		this.jobless = true;
@@ -248,8 +246,8 @@ class State
 				this[f] = val[f];
 			}
 
-			if (this._version != version)
-				this._version = version;
+			// if (this._version != version)
+			// 	this._version = version;
 
 			this._isLoaded = true;
 			if (this._timestamp)
@@ -270,6 +268,7 @@ class State
 	}
 
 	get loaded() {return this._isLoaded;}
+	get version() {return this._version;}
 
 	get timestamp() {return this._timestamp;}	
 	get day() {return Math.floor(this._timestamp / 86400000) - Math.floor(this._beginTimestamp / 86400000) + 1;}
@@ -560,11 +559,6 @@ window.onload = function()
 	salaryItem.value = "$"+state.salary+" / "+beaday(sets.salaryPeriod);
 	state.home = state.home;
 	skillItem.value = state.skill;
-
-	var verspan = document.createElement("span");
-	verspan.id = "version";
-	verspan.innerHTML = "&copy; 2016-2023 NerabotiX v" + state._version;
-	document.body.appendChild(verspan);
 
 	clock.onnight = function()
 	{
@@ -2368,7 +2362,24 @@ async function getJson(url)
 function checkVersion()
 {
 	getJson('./version.json').then(json =>
-    {
-		console.log(json);
+    {		
+		let ver = json.releases[json.latestVersion];
+		if (state.version == 0)
+		{
+			let verspan = document.querySelector("#version>span");
+			state._version = json.latestVersion;
+			verspan.innerHTML = `&copy; 2016-2023 NerabotiX ${state.version}`;
+			document.body.appendChild(verspan);
+		}
+		else if (state.version != json.latestVersion)
+		{
+			let verdiv = document.querySelector("#version>div");
+			verdiv.innerHTML = `
+				New version is available!<br>
+				<h2>${json.latestVersion}</h2>
+				<p>Release date: ${ver.date}</p>
+				<p>${ver.info}</p>
+			`;
+		}
 	});
 }
