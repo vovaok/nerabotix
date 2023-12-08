@@ -1,6 +1,6 @@
 {
     "latestVersion": "v0.8.6",
-    "releases": [
+    "releases": {
         "v0.8.6": {
             "major": "0",
             "minor": "8",
@@ -29,5 +29,5 @@
             "date": "05.11.2016 12:00:00",
             "info": "Origin"
         }
-    ]
+    }
 }
