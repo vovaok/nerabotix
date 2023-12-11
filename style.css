@@ -68,9 +68,16 @@ body.drunk
 body.drunk .sheet
 {
 	transition: all 2s cubic-bezier(1, 1.58, 0.29, -1.33);
-	transform: skew(-10deg);
 	filter: blur(10px);
-	background-color: #00F4;
+	background-color: #88F8;
+	
+}
+
+body.drunk * *
+{
+	transition: all 2s linear;
+	transform: rotateZ(90deg);
+	color: blue;
 }
 
 h2
@@ -192,13 +199,13 @@ body
 {
 	/* justify-content: flex-start; */
 	width: 45%;
-	max-height: calc(50vh - 5em);
+	max-height: 50vh;
 }
 
-.ProgressBar
+/* .ProgressBar
 {
 	max-width: 20em;
-}
+} */
 
 #doc
 {
@@ -289,7 +296,7 @@ body
 	margin-top: .5em;
 }
 
-button
+button, select
 {
 	font-size: smaller;
 	height: 2.3em;
@@ -319,16 +326,6 @@ input
 	top: 2px;
 }
 
-[hint]::before
-{
-	position: absolute;
-	display: block;
-	right: 25%;
-	content: attr(hint);
-	transition: opacity 1s;
-	opacity: 0;
-}
-
 [hint]:hover::before
 {
 	opacity: 1;
@@ -349,6 +346,21 @@ input
 	backdrop-filter: blur(.2em);
 	z-index: 100;
 }
+
+[hint]::before
+{
+	pointer-events: none;
+	position: absolute;
+	right: 25%;
+	content: attr(hint);
+	transition: opacity .5s cubic-bezier(1, 0, 1, 0);
+	opacity: 0;
+}
+
+/* [hidden]
+{
+	display: none;
+} */
 
 #items
 {
@@ -428,6 +440,11 @@ table
 	padding: 0;
 }
 
+#workTable > tbody > tr > td:nth-child(2)
+{
+	width: 20%;
+}
+
 #workTable > tbody > tr > td:nth-child(3)
 {
 	width: 100%;
@@ -470,6 +487,12 @@ table
 	position: relative;
 }
 
+.stack table > tr:hover
+{
+	background-color: #FFF2;
+	box-shadow: 0 0 5px #0002;
+}
+
 .stack table > tr > td
 {
 	padding: 0;
@@ -487,10 +510,10 @@ table
 .stack table > tr > td:nth-child(3)
 {
 	text-align: right;
-	width: 25%;
+	/* width: 25%; */
 }
 
-.stack:not(#shop):has(button:not([disabled]))>h2::after,
+.stack:not(#shop):has(tr:not([style*='display']) button:not([disabled]))>h2::after,
 #version:has(div:not(:empty))::after
 {
 	content: '';
@@ -498,8 +521,8 @@ table
 	position: absolute;
 	margin-left: .25em;
 	width: .45em;
-	height: .45em;
-	border-radius: .45em;
+	aspect-ratio: 1;
+	border-radius: 50%;
 	background-color: #F44;
 	border: 1px solid white;
 }
@@ -560,7 +583,7 @@ table
 	position: relative;
 	top: .2em;
 	min-width: 150px;
-	width: 15vw;
+	/* width: 15vw; */
 	border: 1px solid black;
 	padding: 1px;
 	border-radius: 4px;
@@ -750,4 +773,34 @@ body.night #version
 	padding: 2px;
 	box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.2);
 	background-color: rgba(255, 255, 255, 0.25);
+}
+
+select
+{
+	width: 14ch;
+	border-radius: .2em;
+}
+
+select option
+{
+	color: black;
+	/* line-height: 1.5em; */
+	background-color: var(--theme-color-auto);
+	border-radius: 15px;
+	border: none;
+}
+
+select option:disabled
+{
+	color: var(--theme-color-auto-dark);
+}
+
+select option:selected
+{
+	background-color: var(--theme-color-auto-dark);
+}
+
+select:invalid
+{
+	color: var(--theme-color-dark);
 }

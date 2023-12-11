@@ -1,3 +1,5 @@
+var globalVersion = 0;
+
 var upgrades = 
 {
  	"Success": {_var: "taskSolveChance", values: [30, 40, 50, 60, 70, 80, 90, 100], xp: [100, 250, 666, 1000, 1666, 2500, 4000, 6666], info: "Improve your punctuality from $cur% to $next% to complete the tasks"},
@@ -221,6 +223,7 @@ class State
 		this._cantWork = false;
 		this._uselessWork = false;
 		this._checkinActive = false;
+		this._canmix = false;
 
 		this.deadlinesInRow = 0;
 		this.deadlinesPassed = 0;
@@ -647,6 +650,17 @@ window.onload = function()
 		}
 	}
 
+	/// @todo it later
+	var sel1 = getById("mixItem1");
+	var sel2 = getById("mixItem2");
+	sel1.onchange = updateAppearance;
+	sel2.onchange = updateAppearance;
+	// sel1.onchange = () =>
+	// {
+		// let opt2 = sel2.querySelector(`[value='${sel1.value}']`);
+		// opt2.disabled = true;
+	// };
+
 	checkVersion();
 
 // 	if (clock.isNight)
@@ -943,7 +957,7 @@ function updateAppearance()
 	if (state._deadlineDay > state.day)
 	{
 		if (state._deadlineDay - state.day == 1)
-			setHeader("Deadline tomorrow! Don't forget to complete all tasks and be at work!");
+			setHeader("Deadline tomorrow!<br>Don't forget to complete all tasks and be at work!");
 		else
 			setHeader("Deadline in "+beaday(state._deadlineDay - state.day)+"!");
 	}
@@ -988,8 +1002,10 @@ function updateAppearance()
 		var val = opt.value;
 		if (!(sets.goodsBought[val] || 0))
 		{
-			sel1.removeChild(opt);
-			i--;
+			opt.disabled = true;
+			opt.value = "";
+			// sel1.removeChild(opt);
+			// i--;
 		}
 		var idx = mixAvail.indexOf(val);
 		if (idx >= 0)
@@ -1001,25 +1017,32 @@ function updateAppearance()
 		var val = opt.value;
 		if (!(sets.goodsBought[val] || 0))
 		{
-			sel2.removeChild(opt);
-			i--;
+			opt.disabled = true;
+			opt.value = ""
+			// sel2.removeChild(opt);
+			// i--;
 		}
 	}
 	for (var i=0; i<mixAvail.length; i++)
 	{
 		var val = mixAvail[i];
-		if (val != "" && sets.goodsBought[val])
+		if (val != "" && (val in sets.goodsBought))//sets.goodsBought[val])
 		{
+			if (sel1.querySelector(`[label='${val}']`))
+				continue;
 			var opt1 = document.createElement("option");
 			opt1.value = val;
+			opt1.label = val;
 			opt1.text = val;
 			sel1.appendChild(opt1);
 			var opt2 = document.createElement("option");
 			opt2.value = val;
+			opt2.label = val;
 			opt2.text = val;
 			sel2.appendChild(opt2);
 		}
 	}
+	state._canmix = canmix(sel1.value, sel2.value);
 
 	if (sets.goodsBought["Latte"] || 0)
 		coffeeChk.text = "Latte";
@@ -1043,13 +1066,13 @@ function updateAppearance()
 
 function setHeader(txt)
 {
-	headerSpan.innerText = txt;
+	headerSpan.innerHTML = txt;
 }
 
 function setFooter(txt)
 {
 	var div = document.createElement("div");
-	div.innerText = txt;
+	div.innerHTML = txt;
 	footer.appendChild(div);
 
 	var _tim = setTimeout(function()
@@ -1370,9 +1393,13 @@ function update(warpCount)
 	homeBtn.widget.disabled = busy || (sleepyProgress.value == 100);
 	checkinBtn.widget.disabled = busy || (sleepyProgress.value == 100) || state.home || checkinBtn.piupiu;
 
-	coffeeBtn.widget.disabled = (coffeeProgress.value) || (sleepyProgress.value == 100);
-	mixBtn.widget.disabled = (mixProgress.value) || (sleepyProgress.value == 100);
-
+	coffeeBtn.widget.disabled = busy || (coffeeProgress.value) || (sleepyProgress.value == 100);
+	mixBtn.widget.disabled = busy || (mixProgress.value) || !state._canmix || (sleepyProgress.value == 100);
+	for (var i=0; i<5; i++)
+	{
+		window["compBtn"+i].widget.disabled = !state.tasksPending || (sleepyProgress.value == 100);
+	}
+	
 	beerBtn.widget.disabled = (hpProgress.value == 0) || (sleepyProgress.value == 100);
 	stoutBtn.widget.disabled = (hpProgress.value == 0) || (sleepyProgress.value == 100);
 	vodkaBtn.widget.disabled = (hpProgress.value == 0) || (sleepyProgress.value == 100);
@@ -1963,6 +1990,12 @@ function startComputer(n)
 			btn.widget.showHint("Computer doesn't work");
 		}
 
+		if (!state.tasksPending)
+		{
+			bar.value = 100;
+			btn.widget.showHint("All tasks done");
+		}
+
 		var step = cnt / sets.compDuration;
 		var t = cnt * sets.compSolveAmount;
 		if (ovc.checked)
@@ -2106,6 +2139,8 @@ function reset()
 
 function canmix(item1, item2)
 {
+	if (item1 == item2)
+		return false;
 	return ((sets.goodsBought[item1] || 0) && (sets.goodsBought[item2] || 0));
 }
 
@@ -2179,7 +2214,8 @@ function mix(item1, item2)
 			sets.goodsBought[res] = (sets.goodsBought[res] || 0) + 1;
 			updateAppearance();
 			setFooter("You made a " + res);
-			mixBtn.widget.disabled = false;
+			updateAppearance();
+			// mixBtn.widget.disabled = false;
 			getById("mixItem1").disabled = false;
 			getById("mixItem2").disabled = false;
 		}
@@ -2364,8 +2400,14 @@ function checkVersion()
 	getJson('./version.json').then(json =>
     {		
 		let ver = json.releases[json.latestVersion];
-		if (state.version == 0)
+		if (globalVersion == 0)
 		{
+			globalVersion = json.latestVersion;
+			if (state.version != globalVersion)
+			{
+				/// @todo: migrateVersion();
+				state._version = globalVersion;
+			}
 			let verspan = document.querySelector("#version>span");
 			state._version = json.latestVersion;
 			verspan.innerHTML = `&copy; 2016-2023 NerabotiX ${state.version}`;

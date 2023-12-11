@@ -326,8 +326,9 @@ class UpgradeItem extends Widget
 		this._btn = btn;
 
 		var tr = document.createElement("tr");
-		tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
-		tr.onmouseout = function(){btn.widget.collapseHint();};
+		tr.setAttribute("hint", _this.hintText);
+		// tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
+		// tr.onmouseout = function(){btn.widget.collapseHint();};
  		this._tr = tr;
 		var td = document.createElement("td");
 		td.innerText = name;
@@ -596,9 +597,10 @@ class ShopItem extends Widget
 		var _this = this;
 
 		var tr = document.createElement("tr");
+		tr.setAttribute("hint", _this.hintText);
 		this._tr = tr;
-		tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
-		tr.onmouseout = function(){btn.widget.collapseHint();};
+		// tr.onmouseover = function(){btn.widget.showHint(_this.hintText);};
+		// tr.onmouseout = function(){btn.widget.collapseHint();};
 		var td = document.createElement("td");
 		td.innerText = name;
 		tr.appendChild(td);

@@ -1,6 +1,13 @@
 {
-    "latestVersion": "v0.8.6",
+    "latestVersion": "v0.8.7",
     "releases": {
+        "v0.8.7": {
+            "major": "0",
+            "minor": "8",
+            "release": "7",
+            "date": "11.12.2023 18:36:55",
+            "info": "Bug fix and more improvements"
+        },
         "v0.8.6": {
             "major": "0",
             "minor": "8",

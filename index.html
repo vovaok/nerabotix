@@ -4,6 +4,7 @@
 <meta http-equiv="Cache-Control" content="no-store" />
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 <title>NerabotiX</title>
+<link rel="icon" href="icon.png">
 <link rel="stylesheet" type="text/css" href="style.css">
 <script type="text/javascript" src="widgets.js"></script>
 <script type="text/javascript" src="npc.js"></script>
@@ -11,6 +12,12 @@
 </head>
 
 <body>
+
+<span id="version">
+	<div></div>
+	<span>&copy; 2016-2023 NerabotiX</span>
+</span>	
+	
 <div id="doc" class="sheet closed">
 	<div id="header">
 		<div id="temp">
@@ -80,7 +87,7 @@
 		  </tr><tr>
 			<td><button id="mixBtn" title="Make cocktail" onclick="makeCocktail();">Shake</button></td>
 			<td><div id="mixProgress" class="ProgressBar" color="brown"></div></td>
-			<td><select id="mixItem1"></select><select id="mixItem2"></select></td>
+			<td><select id="mixItem1" required></select> + <select id="mixItem2" required></select></td>
 		  </tr><tr>
 			<td><button id="compBtn0" title="Start the computer to automatically complete the tasks" onclick="startComputer(0);">Start computer</button></td>
 			<td><div id="compProgress0" class="ProgressBar"></div></td>
@@ -133,7 +140,7 @@
 	<tr title="Sleepiness">	<td>SL</td><td><div id="sleepyProgress" class="ProgressBar smooth" color="#8F70C5"></div></td>	</tr>
 	<tr title="Authority">	<td>AT</td><td><div id="weightProgress" class="ProgressBar smooth" color="#808080"></div></td>	</tr>
 	</tbody></table>
-	<div id="itemsHave" style="display:none;">
+	<div id="itemsHave" class="itemcontainer" style="display:none;">
 	<h2 style="padding-top: 16px;">You have:</h2>
 	</div>
 </div>
@@ -144,6 +151,7 @@
 		<br>
 		<div id="availXP" class="Item">Remaining XP:</div>
 		<div class="itemcontainer"><table id="upgradetable"></table></div>
+		<!--<ul id="upgrade-list" class="itemcontainer"></ul>-->
 	</div>
 </div>
 <div id="achievements" class="sheet stack closed" style="display:none;">
@@ -161,11 +169,6 @@
 		<div class="itemcontainer"><table id="shoptable"></table></div>
 	</div>
 </div>
-
-<span id="version">
-	<div></div>
-	<span>&copy; 2016-2023 NerabotiX</span>
-</span>
 
 </body>
 </html>
