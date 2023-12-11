@@ -2411,7 +2411,7 @@ function checkVersion()
 			let verspan = document.querySelector("#version>span");
 			state._version = json.latestVersion;
 			verspan.innerHTML = `&copy; 2016-2023 NerabotiX ${state.version}`;
-			document.body.appendChild(verspan);
+			// document.body.appendChild(verspan);
 		}
 		else if (state.version != json.latestVersion)
 		{
