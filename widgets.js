@@ -843,6 +843,26 @@ HTMLElement.prototype.collapseHint = function()
         this._hint.hide();
 }
 
+HTMLElement.prototype.popupText = function(txt, color)
+{
+	let div = document.createElement("div");
+	div.className = "popup";
+	if (color)
+		div.style.color = color;
+	div.innerHTML = txt;
+	this.append(div);
+	div.onanimationend = div.remove;
+}
+
+HTMLElement.prototype.popupDelta = function(delta, colorPlus, colorMinus, prefix)
+{
+	prefix = prefix || "";
+	if (delta > 0)
+		this.popupText("+" + prefix + delta, colorPlus);
+	else if (delta < 0)
+		this.popupText("-" + prefix + (-delta), colorMinus);
+}
+
 class ProgressBar extends Widget
 {
 	constructor(color)
@@ -973,6 +993,12 @@ class Clock extends Widget
     	return parseInt(cap[1]) + parseInt(cap[2]) / 60;
     }
 
+	minutesTillTime(t)
+	{
+		let delta = this.timeSub(t, this.time);
+		return parseInt(this.hoursFromTime(delta) * 60);
+	}
+
     _update()
     {
         if (typeof(state) != "undefined")
@@ -1083,13 +1109,25 @@ class Clock extends Widget
 
     warpTime(minutes)
     {
-    	var n = minutes;
-    	for (var i=0; i<n; i++)
+		if (minutes <= 0)
+			return 0;
+		while (minutes--)
     	{
     		this._timestamp += 60000;
     		this._update();
+			if (this._abortWarp)
+			{
+				this._abortWarp = false;
+				break;
+			}
     	}
+		return ++minutes;
     }
+
+	abortWarp()
+	{
+		this._abortWarp = true;
+	}
 
 	get percentOfNight()
 	{

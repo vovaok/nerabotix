@@ -16,13 +16,14 @@
 body
 {
 	background: var(--theme-color-alter) top center fixed;
+	/* background-color: transparent; */
+	/* background-blend-mode: color; */
 	background-repeat: repeat-x;
-	/* background-size: cover; */
+	background-size: cover auto;
     transition: background 2s ease-in-out,
 				background-position 0s linear;
 
     background-image: url('back.jpg');
-	/* background-image: radial-gradient(white, transparent); */
 	margin: 0;
 	user-select: none;
 	
@@ -40,6 +41,12 @@ body.night
 	--theme-color-auto: var(--theme-color-night);
 	--theme-color-auto-dark: var(--theme-color-night-dark);
 	--theme-color-auto-contrast: var(--theme-color-night);
+}
+
+body.amnesia
+{
+	background-color: white;
+	background-blend-mode: color;
 }
 
 .sheet
@@ -294,6 +301,11 @@ body
 #footer>*:first-child
 {
 	margin-top: .5em;
+}
+
+#footer>[count]::after
+{
+	content: ' (x' attr(count) ')';
 }
 
 button, select
@@ -803,4 +815,33 @@ select option:selected
 select:invalid
 {
 	color: var(--theme-color-dark);
+}
+
+.popup
+{
+	position: absolute;
+	z-index: 100;
+	top: 0;
+	left: 0;
+	min-width: 100%;
+	background: none !important;
+	text-align: center;
+	--color2: color-mix(in hsl longer hue, currentcolor, currentcolor);
+	animation: 2s popup-pop ease-out;
+	animation-iteration-count: 1;
+	text-shadow: 0 0 3px currentcolor;
+}
+
+@keyframes popup-pop
+{
+	from
+	{
+		transform: translateY(0);
+		opacity: 100%;
+	}
+	to
+	{
+		transform: translateY(-200%) scale(200%);
+		opacity: 50%;
+	}
 }

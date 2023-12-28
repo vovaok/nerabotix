@@ -11,7 +11,7 @@ var upgrades =
  	"Tea drinking": {_var: "teaDuration", values: [18, 16, 14, 12, 10, 8, 6, 4, 2, 1, 0.5], xp: [100, 250, 500, 1000, 2500, 5000, 10000, 25000, 50000, 1e9, 1e12], info: "Reduce the time of tea drinking from $cur to $next minutes"},
  	"Force of tea": {_var: "teaStrength", values: [15, 20, 25, 30, 35, 40, 45, 50], xp: [100, 250, 500, 1000, 2000, 5000, 10000, 25000], info: "Tea drinking regain $next HP instead of $cur"},
  	"Lunch time": {_var: "lunchDuration", values: [50, 40, 30, 20, 10, 5], xp: [500, 1500, 4000, 6666, 10000, 1e9], info: "Increase chewing speed: lunch takes $next minutes instead of $cur"},
- 	"Sleep time": {_var: "baseSleepTime", values: [420, 360, 300, 240, 180, 120, 60], xp: [1000, 2500, 5000, 10000, 25000, 50000, 1e9], info: "Decrease time to full recovery while sleeping from $cur to $next minutes"},
+ 	// "Sleep time": {_var: "baseSleepTime", values: [420, 360, 300, 240, 180, 120, 60], xp: [1000, 2500, 5000, 10000, 25000, 50000, 1e9], info: "Decrease time to full recovery while sleeping from $cur to $next minutes"},
  	"Early morning": {_var: "workBegin", values: ["08:30", "08:00", "07:30", "07:00", "06:30", "06:00"], xp: [1000, 5000, 10000, 50000, 100000, 500000], info: "Work begins at $next, not in $cur"},
  	"Late evening": {_var: "workEnd", values: ["18:30", "19:00", "19:30", "20:00", "20:30", "21:00"], xp: [1000, 5000, 10000, 50000, 100000, 500000], info: "Work ends at $next, not in $cur"},
  	"Quick money": {_var: "salaryPeriod", values: [10, 7, 5, 3, 2, 1], xp: [500000, 1000000, 1500000, 2000000, 2500000, 3000000], info: "Get paid every $next days instead of $cur", onbuy: function(){state.updateMultiplier(1);}},
@@ -203,9 +203,9 @@ class State
 		this._lvl = 0;
 		this.eatFlag = false;
 		this.sleepedToday = false;
-		this.sleepyMult = 1;
+		this._isSleeping = false;
 		this._home = false;
-		this._money = 0;
+		// this._money = 0; don't take money
 		this._baseSalary = 500; // per month
 		this._lastSalaryDay = 0;
 		this._deadlineDay = 0;
@@ -295,9 +295,8 @@ class State
 	{
 		if (value < this._XP)
 			return;
-		var delta = value - this._XP;
+		let delta = value - this._XP;
 		this._XP = value;
-// 		xpItem.value = this._XP;
 		this._availXP += delta;
 		availXP.value = beanum(this._availXP);	
 		while (this._XP >= getXPforLvl(this._lvl+1))
@@ -306,14 +305,15 @@ class State
 			if (typeof(onLvlChange) == "function")
 				onLvlChange(this._lvl);
 		}
-		for (var upg in upgItems)
+		for (let upg in upgItems)
 		{
 			upgItems[upg].updateAvail();
 		}
 
-		var dxp = (this._XP - getXPforLvl(this._lvl)) / getXPdeltaForLvl(this._lvl+1);
+		let dxp = (this._XP - getXPforLvl(this._lvl)) / getXPdeltaForLvl(this._lvl+1);
 		xpProgress.value = dxp * 100;
 		xpProgress.text = beanum(this._XP) + "/" + beanum(getXPforLvl(this._lvl+1));
+		xpProgress.widget.popupText("+" + delta, xpProgress.color);
 	}
 
 	get availXP() {return this._availXP;}
@@ -330,9 +330,11 @@ class State
 	get HP() {return this._HP;}
 	set HP(value)
 	{
+		let delta = value - this._HP;
 		hpProgress.value = value;
 		this._HP = hpProgress.value;
 		hpProgress.text = Math.round(this._HP) + "/" + "100";
+		hpProgress.widget.popupDelta(delta, hpProgress.color, "red");			
 	}
 
 	get sleepy() {return this._sleepy;}
@@ -373,7 +375,12 @@ class State
 	get money() {return this._money;}
 	set money(val) 
 	{
+		let delta = val - this._money;
 		this._money = val;
+		if (delta > 0)
+			moneyItem.widget.popupText("+$"+beanum(delta), "green");
+		else if (delta < 0)
+			moneyItem.widget.popupText("-$"+beanum(-delta), "red");
 		moneyItem.value = "$" + beanum(this._money);
 		for (var name in goodsItems)
 			goodsItems[name].update();
@@ -1071,25 +1078,23 @@ function setHeader(txt)
 
 function setFooter(txt)
 {
-	var div = document.createElement("div");
-	div.innerHTML = txt;
-	footer.appendChild(div);
-
-	var _tim = setTimeout(function()
+	let div = footer.lastChild;
+	if (div && div.innerHTML == txt)
 	{
-		clearTimeout(_tim);
-		footer.removeChild(div);
-	}, 10000);
-
-// 	if (typeof(_footer_tim) != "undefined")
-// 		clearTimeout(_footer_tim);
-// 	footer.innerText = txt;
-// 	_footer_tim = setTimeout(function()
-// 	{	
-// 		footer.innerText = "";
-// 		clearTimeout(_footer_tim);
-// 		delete _footer_tim;
-// 	}, 10000);
+		let cnt = parseInt(div.getAttribute("count") || 1) + 1;
+		div.setAttribute("count", cnt);
+	}
+	else
+	{
+		div = document.createElement("div");
+		div.innerHTML = txt;
+		footer.appendChild(div);
+		var _tim = setTimeout(function()
+		{
+			clearTimeout(_tim);
+			footer.removeChild(div);
+		}, 10000);
+	}
 }
 
 function showButton(txt)
@@ -1178,18 +1183,22 @@ function doWork()
 
 function onWorkDone()
 {
+	let xpadd = 0;
+	
 	if (state.tasksPending)
-		state.XP += state.tasksCompleted * (state.skill + 1);
-	if (!state.tasksCompleted || !state.tasksPending)
-		state.XP += parseInt(state.skill / 2);
+		xpadd = state.tasksCompleted * (state.skill + 1);
+	// this can be as upgrade from the skill points!
+	// if (!state.tasksCompleted || !state.tasksPending)
+	// 	xpadd = parseInt(state.skill / 2);
 
 	state.HP -= 10*state._workHPmult;
-	var slpts = 5 - state.lunchCountAfterSleep*2;
-	if (slpts < 0)
-		slpts = 0;
-	state.sleepy += slpts;
+	// var slpts = 5 - state.lunchCountAfterSleep*2;
+	// if (slpts < 0)
+	// 	slpts = 0;
+	// state.sleepy += slpts;
 
-	checkTask();
+	xpadd += checkTask();
+	state.XP += xpadd;	
 }
 
 function checkTask()
@@ -1210,7 +1219,7 @@ function checkTask()
 
 		state.tasksPending -= t;
 		state.tasksCompleted += t;
-		state.XP += (2*state.tasksCompleted - t) * t * (state.skill+1);
+		let xpadd = 2 * (state.tasksCompleted - t) * t * (state.skill+1);
 // 		state.sleepy -= 10;
 		state.loserCount = 0;
 
@@ -1231,6 +1240,7 @@ function checkTask()
 			workBtn.widget.collapseHint();
 			doStep();
 		}
+		return xpadd;
 	}
 	else if (state.tasksPending>0)
 	{
@@ -1247,6 +1257,7 @@ function checkTask()
 	{
 		homeBtn.widget.showHint("You must go to the job to submit a report by deadline");
 	}
+	return 0;
 }
 
 function tea()
@@ -1352,10 +1363,24 @@ function update(warpCount)
 		state.curNpc.update(warpCount);
 	}
 
+	// someone nasty can wake you up only in daylight time
+	if (state._isSleeping && !state.home && !clock.isNight)
+	{
+		if (Math.random() < 0.02)
+		{
+			clock.abortWarp();
+		}
+	}
+
 	if (state.sleepy < 100)
 	{ 
-		if (lunchBtn.visible)
-			state.sleepy += 0.02 * warpCount * (state.coffeeStrength/5 + 1);
+		if (lunchBtn.visible) 
+		{
+			let sleepBase = 0.001 * (state.sleepy*0.4 + 1); // about 16 hours to be full sleepy
+			if (clock.isNight)
+			 	sleepBase *= 10;
+			state.sleepy += sleepBase * warpCount * (state.coffeeStrength/5 + 1);
+		}
 	}
 	else if (!sleepBtn.visible && state.step < 17)
 	{
@@ -1397,7 +1422,8 @@ function update(warpCount)
 	mixBtn.widget.disabled = busy || (mixProgress.value) || !state._canmix || (sleepyProgress.value == 100);
 	for (var i=0; i<5; i++)
 	{
-		window["compBtn"+i].widget.disabled = !state.tasksPending || (sleepyProgress.value == 100);
+		var bar = window["compProgress"+i];
+		window["compBtn"+i].widget.disabled = (bar.value > 0) || !state.tasksPending || (sleepyProgress.value == 100);
 	}
 	
 	beerBtn.widget.disabled = (hpProgress.value == 0) || (sleepyProgress.value == 100);
@@ -1490,24 +1516,29 @@ function sleep()
 	if (state.step == 16)
 		doStep();
 
-	var sleepTime = sets.baseSleepTime * state.sleepy / 100;
-	if (!state.home)
-	{
-		sleepTime *= 0.1 + Math.random()*0.1;
-	}
+	let sleepTime = sets.baseSleepTime * state.sleepy / 100;
+	// if (!state.home)
+	// {
+	// 	let nightRestTime = clock.minutesTillTime(sets.workBegin);
+	// 	let delta = sleepTime - nightRestTime;
+	// 	if (delta > 0)
+	// 		sleepTime *= 0.1 + Math.random()*0.1;
+	// }
 
 	doc.classList.add("closed");
 
-	var sleepyBeforeSleep = state.sleepy;
+	let sleepyBeforeSleep = state.sleepy;
 
  	setTimeout(function()
  	{
-		clock.warpTime(sleepTime);
-		this.lastBeSleepy = this._timestamp;
+		state._isSleeping = true;
+		sleepTime -= clock.warpTime(sleepTime);
+		state._isSleeping = false;
+		state.lastBeSleepy = state.timestamp;
 		state._workHPmult = 1;
 		state.coffeeStrength = 0;		
 		state.lunchCountAfterSleep = 0;
-		var pts = sleepTime*100/sets.baseSleepTime;
+		let pts = sleepTime*100/sets.baseSleepTime;
 		state.HP -= pts;
 		state.sleepy = sleepyBeforeSleep - pts;
 		state.sleepedToday = true;
@@ -1518,7 +1549,7 @@ function sleep()
 		{
 			state.eatFlag = false;
 		}
-		else
+		else if (state.sleepy > 0)
 		{
 			setFooter("Someone nasty woke you up! Go home if you want to sleep deeply.");
 		}
@@ -2373,7 +2404,7 @@ function doAmnesia()
 	{
 		amnesiaBtn.widget.disabled = true;
 		amnesiaBtn.widget.collapseHint();
-		document.body.style.backgroundImage = "url('white.png')";
+		document.body.className = "amnesia";
 		setFooter("F*** my mind!!");
 		doc.classList.add("closed");
 		setTimeout(function()

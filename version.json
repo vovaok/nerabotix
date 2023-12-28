@@ -1,6 +1,13 @@
 {
     "latestVersion": "v0.8.7",
     "releases": {
+        "v0.9.0": {
+            "major": "0",
+            "minor": "9",
+            "release": "0",
+            "date": "28.12.2023 14:28:13",
+            "info": "Another sleepiness mechanics and some visual effects"
+        },
         "v0.8.7": {
             "major": "0",
             "minor": "8",
